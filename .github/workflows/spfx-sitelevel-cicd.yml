@@ -1,0 +1,62 @@
+name: SPFx Site-Level CI/CD (App Registration Auth)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js (SPFx compatible)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Build & package
+      - name: Build and package SPFx
+        run: |
+          gulp clean
+          gulp bundle --ship
+          gulp package-solution --ship
+
+      # Step 5: Install PnP CLI
+      - name: Install CLI for Microsoft 365
+        run: npm install -g @pnp/cli-microsoft365
+
+      # Step 6: Authenticate with Azure AD App
+      - name: Login with Azure AD App
+        run: |
+          m365 login --authType secret \
+            --tenant ${{ secrets.SPO_TENANT_ID }} \
+            --clientId ${{ secrets.SPO_CLIENT_ID }} \
+            --clientSecret ${{ secrets.SPO_CLIENT_SECRET }}
+
+      # Step 7: Add SPFx package to site-level App Catalog
+      - name: Upload SPFx to site App Catalog
+        run: |
+          m365 spo app add \
+            --filePath sharepoint/solution/*.sppkg \
+            --appCatalogScope sitecollection \
+            --appCatalogUrl ${{ secrets.SPO_SITE_URL }} \
+            --overwrite
+
+      # Step 8: Deploy the app
+      - name: Deploy SPFx app on site
+        run: |
+          m365 spo app deploy \
+            --name "<YOUR_SOLUTION_NAME>.sppkg" \
+            --appCatalogScope sitecollection \
+            --appCatalogUrl ${{ secrets.SPO_SITE_URL }}
