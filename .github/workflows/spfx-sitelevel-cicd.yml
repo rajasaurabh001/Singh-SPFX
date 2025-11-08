@@ -62,12 +62,12 @@ jobs:
         run: npm install -g @pnp/cli-microsoft365
 
       # 🟢 Step 4: Authenticate with Azure AD App (Client Secret Auth)
-      - name: Login with Azure AD App
+      - name: Login with Azure AD App (Client Secret Auth)
         run: |
           m365 login --authType secret \
             --tenant ${{ secrets.SPO_TENANT_ID }} \
-            --clientId ${{ secrets.SPO_CLIENT_ID }} \
-            --clientSecret ${{ secrets.SPO_CLIENT_SECRET }}
+            --appId ${{ secrets.SPO_CLIENT_ID }} \
+            --secret ${{ secrets.SPO_CLIENT_SECRET }}
 
       # 🟢 Step 5: Upload SPFx app to Site App Catalog
       - name: Upload SPFx to Site App Catalog
