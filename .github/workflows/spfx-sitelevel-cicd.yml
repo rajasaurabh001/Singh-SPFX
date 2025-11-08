@@ -81,7 +81,10 @@ jobs:
       # 🟢 Step 6: Deploy SPFx app on Site
       - name: Deploy SPFx app
         run: |
+          APP_NAME=$(basename ./deploy/*.sppkg)
+          echo "Deploying $APP_NAME to site collection app catalog..."
           m365 spo app deploy \
-            --name "<YOUR_SOLUTION_NAME>.sppkg" \
+            --name "$APP_NAME" \
             --appCatalogScope sitecollection \
             --appCatalogUrl ${{ secrets.SPO_SITE_URL }}
+
