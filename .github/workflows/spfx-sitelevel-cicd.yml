@@ -67,7 +67,7 @@ jobs:
           m365 login --authType secret \
             --tenant ${{ secrets.SPO_TENANT_ID }} \
             --appId ${{ secrets.SPO_CLIENT_ID }} \
-            --ThumbPrint ${{ secrets.SPO_CLIENT_SECRET }}
+            -ThumbPrint ${{ secrets.SPO_CLIENT_SECRET }}
 
       # 🟢 Step 5: Upload SPFx app to Site App Catalog
       - name: Upload SPFx to Site App Catalog
